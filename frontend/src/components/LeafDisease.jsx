@@ -65,7 +65,7 @@ export default function LeafDisease() {
     }
   };
 
-  // Fetch sensor data on component mount and periodically
+  // Fetch sensor data on component mount and periodicallydaskjdkasjd
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
