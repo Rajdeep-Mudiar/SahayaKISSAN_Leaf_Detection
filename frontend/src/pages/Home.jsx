@@ -115,12 +115,12 @@ export default function SensorDashboard() {
 
     // Check Blister Blight conditions
     // Ideal: humidity 70-80%, temp 18-25°C, moisture 40-70%
-    // HIGH RISK: humidity >85%, temp 18-25°C, moisture >70%
-    if (humidity > 70 && temperature >= 18 && temperature <= 25) {
+    // HIGH RISK: humidity >90%, temp 18-25°C, moisture >70%
+    if (humidity > 85 && temperature >= 18 && temperature <= 25) {
       const riskLevel =
-        humidity > 85 && soil_moisture > 2650
+        humidity > 90 && soil_moisture > 2700
           ? "HIGH"
-          : humidity > 80
+          : humidity > 87
             ? "MEDIUM"
             : "LOW";
       atRiskDiseases.push({
@@ -133,15 +133,15 @@ export default function SensorDashboard() {
 
     // Check Brown Blight conditions
     // Ideal: temp 24-28°C, humidity 70-80%, moisture 40-70%
-    // HIGH RISK: humidity >85%, temp 25-32°C, moisture >70%
-    if (humidity > 70 && temperature >= 24) {
+    // HIGH RISK: humidity >90%, temp 25-32°C, moisture >70%
+    if (humidity > 85 && temperature >= 24) {
       const riskLevel =
-        humidity > 85 &&
+        humidity > 90 &&
         temperature >= 25 &&
         temperature <= 32 &&
-        soil_moisture > 2650
+        soil_moisture > 2800
           ? "HIGH"
-          : humidity > 80 && temperature >= 28
+          : humidity > 87 && temperature >= 28
             ? "MEDIUM"
             : "LOW";
       atRiskDiseases.push({
@@ -153,13 +153,13 @@ export default function SensorDashboard() {
     }
 
     // Check Leaf Red Rust conditions
-    // Thrives in: high humidity (>80%) + poor soil
-    // HIGH RISK: humidity >85%, moisture >70%
-    if (humidity > 60 && temperature >= 22 && temperature <= 30) {
+    // Thrives in: high humidity (>85%) + poor soil
+    // HIGH RISK: humidity >90%, moisture >70%
+    if (humidity > 85 && temperature >= 22 && temperature <= 30) {
       const riskLevel =
-        humidity > 85 && soil_moisture > 2650
+        humidity > 90 && soil_moisture > 2700
           ? "HIGH"
-          : humidity > 80
+          : humidity > 87
             ? "MEDIUM"
             : "LOW";
       atRiskDiseases.push({
@@ -172,12 +172,12 @@ export default function SensorDashboard() {
 
     // Check Red Spider Mite conditions
     // Thrives in: HOT & DRY conditions (opposite of fungi)
-    // HIGH RISK: temp >32°C, humidity <45%, moisture <25%
-    if (temperature > 30 || humidity < 50 || soil_moisture < 2400) {
+    // HIGH RISK: temp >35°C, humidity <40%, moisture <2200
+    if (temperature > 33 || humidity < 40 || soil_moisture < 2300) {
       const riskLevel =
-        temperature > 32 && humidity < 45 && soil_moisture < 2300
+        temperature > 35 && humidity < 40 && soil_moisture < 2200
           ? "HIGH"
-          : (temperature > 30 && humidity < 50) || soil_moisture < 2350
+          : (temperature > 33 && humidity < 45) || soil_moisture < 2250
             ? "MEDIUM"
             : "LOW";
       atRiskDiseases.push({
@@ -189,18 +189,18 @@ export default function SensorDashboard() {
     }
 
     // Check Tea Mosquito Bug conditions
-    // Active in: warm temp 24-32°C with moderate humidity
-    // HIGH RISK: temp >30°C with humidity 50-75%
+    // Active in: warm temp 28-35°C with moderate humidity
+    // HIGH RISK: temp >33°C with humidity 50-75%
     if (
-      temperature >= 24 &&
-      temperature <= 32 &&
+      temperature >= 28 &&
+      temperature <= 35 &&
       humidity >= 50 &&
       humidity <= 75
     ) {
       const riskLevel =
-        temperature > 30 && humidity >= 50
+        temperature > 33 && humidity >= 55
           ? "HIGH"
-          : temperature >= 28
+          : temperature >= 31
             ? "MEDIUM"
             : "LOW";
       atRiskDiseases.push({
@@ -211,11 +211,15 @@ export default function SensorDashboard() {
       });
     }
 
-    // Show alert if any diseases are at risk
-    if (atRiskDiseases.length > 0) {
+    // Show alert only for HIGH or MEDIUM risk diseases
+    const significantRisks = atRiskDiseases.filter(
+      (d) => d.riskLevel === "HIGH" || d.riskLevel === "MEDIUM",
+    );
+
+    if (significantRisks.length > 0) {
       // Find highest risk level
-      const hasHigh = atRiskDiseases.some((d) => d.riskLevel === "HIGH");
-      const hasMedium = atRiskDiseases.some((d) => d.riskLevel === "MEDIUM");
+      const hasHigh = significantRisks.some((d) => d.riskLevel === "HIGH");
+      const hasMedium = significantRisks.some((d) => d.riskLevel === "MEDIUM");
 
       const overallSeverity = hasHigh ? "high" : hasMedium ? "medium" : "low";
       const overallTitle = hasHigh
@@ -228,13 +232,13 @@ export default function SensorDashboard() {
         title: overallTitle,
         severity: overallSeverity,
         disease: "Multiple Diseases",
-        message: `Current environmental conditions are favorable for ${atRiskDiseases.length} disease(s). Your tea plants may be at risk.`,
+        message: `Current environmental conditions are favorable for ${significantRisks.length} disease(s). Your tea plants may be at risk.`,
         action: hasHigh
           ? "IMMEDIATE ACTION REQUIRED!"
           : hasMedium
             ? "Take preventive action within 24-48 hours"
             : "Monitor closely and take preventive measures",
-        atRiskDiseases,
+        atRiskDiseases: significantRisks,
         recommendations: [
           "🔍 Inspect your tea leaves carefully using the Leaf Scan feature",
           "📸 Use OpenCV Leaf Detection to identify early symptoms",
@@ -307,7 +311,7 @@ export default function SensorDashboard() {
     if (type === "soil_moisture") {
       if (value < 2300 || value > 2700)
         return { text: "CRITICAL", class: "badge-critical" };
-      if (value < 2400 || value > 2650)
+      if (value < 2400 || value > 2800)
         return { text: "WARNING", class: "badge-high" };
       return null;
     }
