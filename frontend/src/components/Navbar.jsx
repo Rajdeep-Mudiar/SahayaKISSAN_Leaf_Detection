@@ -17,6 +17,14 @@ export default function Navbar() {
         <Link to="/history" className="navbar-link">
           📋 History
         </Link>
+        <a
+          href="http://localhost:5174/"
+          className="navbar-link"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          🔍 Research
+        </a>
       </div>
       <div className="navbar-right">
         <button

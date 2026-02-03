@@ -12,7 +12,7 @@ dotenv.config();
 
 // -------------------- APP INIT --------------------
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // -------------------- DB CONNECT --------------------
 connectDB();
@@ -21,10 +21,7 @@ connectDB();
 const corsOptions = {
   origin: function (origin, callback) {
     // Allow requests from Vercel domains or localhost
-    const allowedOrigins = [
-      "http://localhost:5173",
-      "https://sahaya-kissan-leaf-detection.vercel.app/",
-    ];
+    const allowedOrigins = ["http://localhost:5173"];
 
     // Allow all Vercel preview deployments
     if (
