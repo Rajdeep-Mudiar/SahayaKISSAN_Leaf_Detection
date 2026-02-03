@@ -14,10 +14,18 @@ export default function LeafDisease() {
   const [severity, setSeverity] = useState(null);
   const [advisory, setAdvisory] = useState(null);
   const [isSpeaking, setIsSpeaking] = useState(false);
+  const [iotConnected, setIotConnected] = useState(false);
 
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+
+  const isSensorDataFresh = (data) => {
+    if (!data?.timestamp) return false;
+    const dataTime = new Date(data.timestamp).getTime();
+    const ageSeconds = (Date.now() - dataTime) / 1000;
+    return ageSeconds < 30;
+  };
 
   // Fetch sensor data on component mount and periodically
   useEffect(() => {
@@ -28,10 +36,21 @@ export default function LeafDisease() {
         );
         if (response.ok) {
           const data = await response.json();
-          setSensorData(data);
+          if (isSensorDataFresh(data)) {
+            setSensorData(data);
+            setIotConnected(true);
+          } else {
+            setSensorData(null);
+            setIotConnected(false);
+          }
+        } else {
+          setSensorData(null);
+          setIotConnected(false);
         }
       } catch (err) {
         console.error("Failed to fetch sensor data:", err);
+        setSensorData(null);
+        setIotConnected(false);
       }
     };
 
@@ -197,21 +216,27 @@ export default function LeafDisease() {
         );
         if (sensorResponse.ok) {
           const latestSensorData = await sensorResponse.json();
-          setSensorData(latestSensorData);
+          if (isSensorDataFresh(latestSensorData)) {
+            setSensorData(latestSensorData);
+            setIotConnected(true);
 
-          // Calculate severity with the latest sensor data
-          const calculatedSeverity = calculateSeverity(
-            data.label,
-            latestSensorData,
-          );
-          setSeverity(calculatedSeverity);
+            // Calculate severity with the latest sensor data
+            const calculatedSeverity = calculateSeverity(
+              data.label,
+              latestSensorData,
+            );
+            setSeverity(calculatedSeverity);
 
-          // Get advisory based on disease and severity
-          const advisoryData = getAdvisory(data.label, calculatedSeverity);
-          setAdvisory(advisoryData);
+            // Get advisory based on disease and severity
+            const advisoryData = getAdvisory(data.label, calculatedSeverity);
+            setAdvisory(advisoryData);
 
-          // Speak the advisory recommendations
-          speakAdvisory(advisoryData, data.label, calculatedSeverity);
+            // Speak the advisory recommendations
+            speakAdvisory(advisoryData, data.label, calculatedSeverity);
+          } else {
+            setSensorData(null);
+            setIotConnected(false);
+          }
         } else {
           // Fallback to existing sensor data if fetch fails
           const calculatedSeverity = calculateSeverity(data.label, sensorData);
@@ -312,7 +337,7 @@ export default function LeafDisease() {
       </header>
 
       {/* Sensor Data Panel */}
-      {sensorData && (
+      {iotConnected && sensorData ? (
         <div className="sensor-data-panel">
           <h3 className="sensor-data__title">📊 Live Sensor Data</h3>
           <div className="sensor-data__grid">
@@ -335,6 +360,17 @@ export default function LeafDisease() {
               </span>
             </div>
           </div>
+        </div>
+      ) : (
+        <div className="sensor-data-panel sensor-warning">
+          <h3 className="sensor-data__title">⚠️ IoT Device Not Connected</h3>
+          <p className="sensor-data__subtitle sensor-warning__text">
+            Live sensor data is unavailable. Please connect the ESP32 to get the
+            latest readings.
+          </p>
+          <p className="sensor-warning__hint">
+            Ensure the device is powered on and connected to the same network.
+          </p>
         </div>
       )}
 

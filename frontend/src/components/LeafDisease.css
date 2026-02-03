@@ -295,11 +295,39 @@
   box-shadow: 0 10px 25px var(--panel-shadow);
 }
 
+.sensor-warning {
+  border: 2px solid rgba(255, 77, 77, 0.8);
+  background: linear-gradient(
+    135deg,
+    rgba(255, 77, 77, 0.12),
+    rgba(139, 0, 0, 0.12)
+  );
+  box-shadow:
+    0 10px 25px rgba(255, 77, 77, 0.18),
+    0 0 18px rgba(255, 77, 77, 0.15);
+}
+
 .sensor-data__title {
   font-size: 18px;
   font-weight: 700;
   margin-bottom: 12px;
   color: var(--text-title);
+}
+
+.sensor-warning .sensor-data__title {
+  color: #ffb3b3;
+}
+
+.sensor-warning__text {
+  color: #ffd1d1;
+  font-size: 14px;
+  margin: 0 0 6px;
+}
+
+.sensor-warning__hint {
+  color: rgba(255, 179, 179, 0.8);
+  font-size: 12px;
+  margin: 0;
 }
 
 .sensor-data__grid {
