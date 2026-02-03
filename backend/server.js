@@ -19,7 +19,10 @@ connectDB();
 
 // -------------------- CORS OPTIONS --------------------
 const corsOptions = {
-  origin: "http://localhost:5173",
+  origin:
+    process.env.NODE_ENV === "production"
+      ? "https://sahayakissan.vercel.app"
+      : "http://localhost:5173",
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   allowedHeaders: ["Content-Type"],
 };

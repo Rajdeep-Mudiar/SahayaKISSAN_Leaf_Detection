@@ -17,7 +17,9 @@ import {
 } from "recharts";
 import "./Home.css";
 
-const API_BASE_URL = "http://localhost:5000/api-sensor";
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api-sensor`
+  : "http://localhost:5000/api-sensor";
 
 export default function SensorDashboard() {
   const [data, setData] = useState([]);

@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import "./History.css";
 
-const API_BASE_URL = "http://localhost:5000/api-leaf";
+const API_BASE_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/api-leaf`
+  : "http://localhost:5000/api-leaf";
 
 export default function History() {
   const [scans, setScans] = useState([]);
