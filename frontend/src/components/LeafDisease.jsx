@@ -47,7 +47,10 @@ export default function LeafDisease() {
         recommendations: advisoryData?.actions || [],
       };
 
-      const response = await fetch("http://localhost:5000/api-leaf/history", {
+      const apiUrl = import.meta.env.VITE_API_URL
+        ? `${import.meta.env.VITE_API_URL}/api-leaf/history`
+        : "http://localhost:5000/api-leaf/history";
+      const response = await fetch(apiUrl, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -69,9 +72,10 @@ export default function LeafDisease() {
   useEffect(() => {
     const fetchSensorData = async () => {
       try {
-        const response = await fetch(
-          "http://localhost:5000/api-sensor/sensor-data",
-        );
+        const sensorUrl = import.meta.env.VITE_API_URL
+          ? `${import.meta.env.VITE_API_URL}/api-sensor/sensor-data`
+          : "http://localhost:5000/api-sensor/sensor-data";
+        const response = await fetch(sensorUrl);
         if (response.ok) {
           const data = await response.json();
           if (isSensorDataFresh(data)) {
@@ -225,10 +229,15 @@ export default function LeafDisease() {
 
     try {
       const [response] = await Promise.all([
-        fetch("http://localhost:5000/api/leaf/predict", {
-          method: "POST",
-          body: formData,
-        }),
+        fetch(
+          import.meta.env.VITE_API_URL
+            ? `${import.meta.env.VITE_API_URL}/api/leaf/predict`
+            : "http://localhost:5000/api/leaf/predict",
+          {
+            method: "POST",
+            body: formData,
+          },
+        ),
         new Promise((resolve) => setTimeout(resolve, 1200)),
       ]);
 
@@ -257,9 +266,10 @@ export default function LeafDisease() {
 
       // Fetch latest sensor data after disease detection
       try {
-        const sensorResponse = await fetch(
-          "http://localhost:5000/api-sensor/sensor-data",
-        );
+        const sensorUrl = import.meta.env.VITE_API_URL
+          ? `${import.meta.env.VITE_API_URL}/api-sensor/sensor-data`
+          : "http://localhost:5000/api-sensor/sensor-data";
+        const sensorResponse = await fetch(sensorUrl);
         if (sensorResponse.ok) {
           const latestSensorData = await sensorResponse.json();
           if (isSensorDataFresh(latestSensorData)) {
